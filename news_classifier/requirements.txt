@@ -1,0 +1,11 @@
+h5py
+tensorflow
+numpy
+scipy
+nltk
+sklearn
+pandas
+requests
+jsonrpclib-pelix
+tap-news-utils
+certifi

@@ -1,0 +1,72 @@
+version: '3'
+services:
+  nginx:
+    build: ./nginx
+    links:
+        - web_server
+    ports:
+        - 80:80
+  web_server:
+    build: ./web_server
+    links:
+      - backend_server
+    ports:
+      - 127.0.0.1:3000:3000
+  backend_server:
+    build: ./backend_server
+    links:
+      - redis
+      - mongodb
+    ports:
+      - 127.0.0.1:4040:4040
+  news_recommender:
+    build: ./news_recommender
+    command: python -u server.py
+    ports:
+      - 127.0.0.1:5050:5050
+    links:
+      - mongodb
+  click_processor:
+    build: ./news_recommender
+    command: python -u click_log_processor.py
+    links:
+      - mongodb
+  news_classifier:
+    build: ./news_classifier
+    ports:
+      - 127.0.0.1:6060:6060
+    links:
+      - mongodb
+  news_scraper:
+    build: ./news_scraper
+  news_monitor:
+    build: ./news_pipeline
+    command: python -u news_monitor.py
+    links:
+      - redis
+  news_deduper:
+    build: ./news_pipeline
+    command: python -u news_deduper.py
+    links:
+      - mongodb
+      - news_classifier
+  zeppelin:
+    build: ./zeppelin
+    environment:
+      ZEPPELIN_PORT: 8080
+      MASTER: local[*]
+    volumes:
+      - ./zeppelin/logs:/zeppelin/logs
+      - ./zeppelin/notebook:/zeppelin/notebook
+    links:
+      - mongodb
+    ports:
+      - 127.0.0.1:8080:8080
+  redis:
+    image: redis
+    volumes:
+      - ./redis/data:/data
+  mongodb:
+    image: mongo
+    volumes:
+      - ./mongodb/data:/data/db

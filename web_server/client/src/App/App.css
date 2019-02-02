@@ -1,0 +1,11 @@
+.logo_container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.logo {
+  display: block;
+  max-width: 100%;
+  max-height: 150px;
+}
